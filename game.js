@@ -6,54 +6,128 @@ const moveSpeed = 3
 // I'm specifying that the game be 800 pixels wide by 600 pixels tall.
 // If no dimensions are specified the game will be fullscreen.
 var game = new ex.Engine({
-    width: 1100,
+    width: 1200,
     height: 800
 })
 var bottom = game.getDrawHeight()
 
-var blockSize = 40
+var actorSize = 30
+
+var blockSize = 45
 
 function addBlock (x, y) {
-    var block = new ex.Actor(x, y, blockSize, blockSize)
+    var block = new ex.Actor(x * blockSize, y * blockSize, blockSize, blockSize)
     block.color = ex.Color.Black
     block.collisionType = ex.CollisionType.fixed
     game.add(block)
 }
 
+function addRat (x, y) {
+    var rat = new ex.Actor(x * blockSize, y * blockSize, actorSize, actorSize);
+    rat.color = ex.Color.Red
+    rat.CollisionType = ex.CollisionType.passive;
+    // rat.addCollisionGroup('rat')
+    game.add(rat)
+}
+
+function addDwarve (x, y) {
+    var dwarve = new ex.Actor(x * blockSize, y * blockSize, actorSize, actorSize);
+    dwarve.color = ex.Color.Blue
+    dwarve.CollisionType = ex.CollisionType.passive;
+    game.add(dwarve)
+}
+function addChest (x, y) {
+    var chest = new ex.Actor(x * blockSize, y * blockSize, actorSize, actorSize);
+    chest.color = ex.Color.Yellow
+    chest.CollisionType = ex.CollisionType.fixed;
+    game.add(chest)
+}
+function addOrc (x, y) {
+    var orc = new ex.Actor(x * blockSize, y * blockSize, actorSize, actorSize);
+    orc.color = ex.Color.Black
+    orc.CollisionType = ex.CollisionType.passive;
+    orc.health = 10
+    
+    orc.onCollidesWith(function (rat) {
+        game.remove(rat)
+        orc.health = orc.health - 1
+        if (orc.health <= 0) {
+            alert('you are dead')
+        }
+    })
+    
+    game.input.keyboard.on("hold", (evt) => {
+        switch (evt.key) {
+            case ex.Input.Keys.W:
+                orc.pos.y = orc.pos.y - 3    
+            break;
+            case ex.Input.Keys.S:
+                orc.pos.y = orc.pos.y + 3
+            break;
+            case ex.Input.Keys.A:
+                orc.pos.x = orc.pos.x - 3    
+            break;
+            case ex.Input.Keys.D:
+                orc.pos.x = orc.pos.x + 3
+            break;
+            default:
+        }
+    })
 
 
+    game.add(orc)
 
+
+}
 var gameMap = [
     [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
+    [ 1, 0, 0, 0, 0, 2, 1, 4, 2, 0, 0, 0, 1, 0, 0, 0, 0, 2, 1, 4, 0, 0, 2, 0, 0, 0, 1 ],
+    [ 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 1, 4, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 2, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1 ],
+    [ 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 ],
+    [ 1, 5, 0, 0, 0, 2, 1, 0, 2, 0, 1, 0, 2, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 0, 3, 1 ],
+    [ 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 2, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 1, 0, 1, 4, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 ],
+    [ 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 ],
+    [ 1, 0, 0, 0, 0, 2, 1, 4, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 1 ],
     [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ]
 ]
 
 gameMap.forEach(function (mapRow, row) {
     mapRow.forEach(function (wall, col) {
         if (wall === 1) {
-            addBlock(col * blockSize, row * blockSize)
-        } else {
-            // blank, dont do anything
+            addBlock(col, row)
+        } else if (wall === 2) {
+            addRat(col, row)
         }
-    })
+        else if (wall === 3) {
+            addDwarve(col, row)
+        }         
+ else if (wall === 4) {
+            addChest(col, row)
+        }         
+ else if (wall === 5) {
+     addOrc(col, row)
+ }
 })
+
+
+})
+
+
+// addRat(1, 1)
+// addRat(2, 1)
+// addRat(3, 1)
+
+    
 
 
 // var side = new ex.Actor(0, bottom - 630, 200, 210);
