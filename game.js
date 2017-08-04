@@ -2,9 +2,8 @@
 
 const moveSpeed = 3
 
-// Create an instance of the engine.
-// I'm specifying that the game be 800 pixels wide by 600 pixels tall.
-// If no dimensions are specified the game will be fullscreen.
+const log = console.log
+
 var game = new ex.Engine({
     width: 1200,
     height: 800
@@ -19,64 +18,87 @@ function addBlock (x, y) {
     var block = new ex.Actor(x * blockSize, y * blockSize, blockSize, blockSize)
     block.color = ex.Color.Black
     block.collisionType = ex.CollisionType.fixed
+    block.addCollisionGroup('game')
     game.add(block)
 }
 
 function addRat (x, y) {
     var rat = new ex.Actor(x * blockSize, y * blockSize, actorSize, actorSize);
     rat.color = ex.Color.Red
-    rat.CollisionType = ex.CollisionType.passive;
-    // rat.addCollisionGroup('rat')
+    rat.collisionType = ex.CollisionType.fixed;
+    rat.addCollisionGroup('game')
     game.add(rat)
 }
 
 function addDwarve (x, y) {
     var dwarve = new ex.Actor(x * blockSize, y * blockSize, actorSize, actorSize);
     dwarve.color = ex.Color.Blue
-    dwarve.CollisionType = ex.CollisionType.passive;
+    dwarve.collisionType = ex.CollisionType.passive;
+    dwarve.addCollisionGroup('game')
     game.add(dwarve)
 }
 function addChest (x, y) {
     var chest = new ex.Actor(x * blockSize, y * blockSize, actorSize, actorSize);
     chest.color = ex.Color.Yellow
-    chest.CollisionType = ex.CollisionType.fixed;
+    chest.collisionType = ex.CollisionType.fixed;
+    chest.addCollisionGroup('game')
     game.add(chest)
 }
 function addOrc (x, y) {
     var orc = new ex.Actor(x * blockSize, y * blockSize, actorSize, actorSize);
-    orc.color = ex.Color.Black
-    orc.CollisionType = ex.CollisionType.passive;
+    orc.color = ex.Color.Gray
+    orc.collisionType = ex.CollisionType.fixed;
     orc.health = 10
+    orc.addCollisionGroup('game')
+
+    window.orc = orc // for debugging purposes
     
-    orc.onCollidesWith(function (rat) {
-        game.remove(rat)
-        orc.health = orc.health - 1
-        if (orc.health <= 0) {
-            alert('you are dead')
-        }
+    orc.onCollidesWith('game', function (rat) {
+        console.log('onCollidesWith')
+        console.log(rat)
+        // game.remove(rat)
+        // orc.health = orc.health - 1
+        // if (orc.health <= 0) {
+        //     this.emit("death");
+        //     this.onDeath();
+        //     alert('you are dead')
+        //     return;
+        // }
     })
     
-    game.input.keyboard.on("hold", (evt) => {
+    game.input.keyboard.on("press", (evt) => {
+        console.log(evt.key)
         switch (evt.key) {
             case ex.Input.Keys.W:
-                orc.pos.y = orc.pos.y - 3    
-            break;
+                orc.vel.y = -50
+                break;
             case ex.Input.Keys.S:
-                orc.pos.y = orc.pos.y + 3
-            break;
+                orc.vel.y = 50
+                break;
             case ex.Input.Keys.A:
-                orc.pos.x = orc.pos.x - 3    
-            break;
+                orc.vel.x = -50
+                break;
             case ex.Input.Keys.D:
-                orc.pos.x = orc.pos.x + 3
-            break;
+                orc.vel.x = 50
+                break;
+            default:
+        }
+    })
+    game.input.keyboard.on("release", (evt) => {
+        switch (evt.key) {
+            case ex.Input.Keys.W:
+            case ex.Input.Keys.S:
+                orc.vel.y = 0
+                break;
+            case ex.Input.Keys.A:
+            case ex.Input.Keys.D:
+                orc.vel.x = 0
+                break;
             default:
         }
     })
 
-
     game.add(orc)
-
 
 }
 var gameMap = [
